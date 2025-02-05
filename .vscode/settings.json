@@ -1,6 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     // Unofficially, QMK uses spaces for indentation
+    "editor.wordWrap": "off",
     "editor.insertSpaces": true,
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {
@@ -18,7 +19,27 @@
         "xstddef": "c",
         "type_traits": "c",
         "utility": "c",
-        "ranges": "c"
+        "ranges": "c",
+        "__locale": "c",
+        "atomic": "c",
+        "bit": "c",
+        "cstddef": "c",
+        "ios": "c",
+        "limits": "c",
+        "locale": "c",
+        "new": "c",
+        "string": "c",
+        "variant": "c",
+        "compare": "c",
+        "charconv": "c",
+        "chrono": "c",
+        "condition_variable": "c",
+        "optional": "c",
+        "format": "c",
+        "memory": "c",
+        "mutex": "c",
+        "text_encoding": "c",
+        "functional": "c"
     },
     "[markdown]": {
         "editor.trimAutoWhitespace": false,
@@ -28,7 +49,5 @@
     "[json]": {
         "editor.formatOnSave": false
     },
-    "clangd.arguments": [
-        "--header-insertion=never"
-    ]
+    "clangd.arguments": ["--header-insertion=never"]
 }
