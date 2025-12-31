@@ -1,11 +1,11 @@
-// Copyright 2023 QMK
-// SPDX-License-Identifier: GPL-2.0-or-later
-
 #include QMK_KEYBOARD_H
 #include "timer.h"
 #include <math.h>
 #include <stdint.h>
 
+enum custom_keycodes {
+    OS_TOG = SAFE_RANGE,
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -24,15 +24,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * │Ctrl│GUI │Alt │                             │ Alt│ GUI│Ctrl│ │ ← │ ↓ │ → │
      * └────┴────┴────┴─────────────────────────────┴────┴────┴────┘ └───┴───┴───┘
      */
-    
-    [0] = LAYOUT_tkl_ansi_tsangan(
-        KC_ESC,           KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,     QK_MACRO_0, KC_SCRL, QK_MACRO_1,
+
+    [0] = LAYOUT_tkl_ansi_tsangan( //macos
+        KC_ESC,           KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,     QK_MACRO_1, OS_TOG, QK_MACRO_0,
 
         KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,    KC_INS,  KC_HOME, KC_PGUP,
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,    KC_DEL,  KC_END,  KC_PGDN,
         KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,
         KC_LSFT,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RSFT,             KC_UP,
-        KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                                      KC_RALT, KC_RGUI, KC_RCTL,    KC_LEFT, KC_DOWN, KC_RGHT
+        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                                      KC_RGUI, KC_RALT, KC_RCTL,    KC_LEFT, KC_DOWN, KC_RGHT
+    ),
+    [1] = LAYOUT_tkl_ansi_tsangan( // windows
+        KC_ESC,           KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,     QK_MACRO_1, OS_TOG, QK_MACRO_0,
+
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,    KC_INS,  KC_HOME, KC_PGUP,
+        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,    KC_DEL,  KC_END,  KC_PGDN,
+        KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,
+        KC_LSFT,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RSFT,             KC_UP,
+        KC_LCTL, KC_LGUI, KC_LALT,                             KC_SPC,                                     KC_RALT, KC_RGUI, KC_RCTL,    KC_LEFT, KC_DOWN, KC_RGHT
     )
 };
 
@@ -219,8 +228,24 @@ static void toggle_macro_og(void) {
         release_all();
         macro_running = false;
         macro_mode = MACRO_NONE;
+
+        uint8_t dl = get_highest_layer(default_layer_state);
+
+        if (dl == 0) {
+            rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
+            rgb_matrix_sethsv_noeeprom(HSV_WHITE);
+        } else {
+            rgb_matrix_mode_noeeprom(RGB_MATRIX_SPLASH);
+            rgb_matrix_sethsv_noeeprom(HSV_RED);
+        }
+
     } else {
         // Start OG macro (UP <-> RCTL)
+
+        // rgb color change
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv_noeeprom(HSV_BLUE);
+
         rng_seed_mix();      // Mix the PRNG for entropy before running
 
         release_all();
@@ -245,8 +270,23 @@ static void toggle_macro_extra(void) {
         release_all();
         macro_running = false;
         macro_mode = MACRO_NONE;
+
+        uint8_t dl = get_highest_layer(default_layer_state);
+
+        if (dl == 0) {
+            rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
+            rgb_matrix_sethsv_noeeprom(HSV_WHITE);
+        } else {
+            rgb_matrix_mode_noeeprom(RGB_MATRIX_SPLASH);
+            // rgb_matrix_sethsv_noeeprom(HSV_RED);
+        }
     } else {
         // Start EXTRA macro (UP <-> A)
+
+        // rgb color change
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv_noeeprom(HSV_BLUE);
+
         rng_seed_mix();
 
         release_all();
@@ -254,7 +294,7 @@ static void toggle_macro_extra(void) {
         macro_mode = MACRO_EXTRA;
         macro_start_time = timer_read32();
 
-        // Start by pressing UP. Next: UP 0.7s ±0.2s -> A 2.4s ±0.3s, loop
+        // Start by pressing UP. Next: UP 0.7s ±0.2s -> A 2.15s ±0.1s, loop
         human_press(KC_UP);
         holding_up = true;
         macro_timer = timer_read32();
@@ -404,11 +444,11 @@ void matrix_scan_user(void) {
                 return;
             }
 
-            // Press A, set next hold time (2.4s ±0.3s)
+            // Press A, set next hold time (2.15s ±0.1s)
             human_press(KC_A);
             holding_a = true;
             macro_timer = timer_read32();
-            set_next_hold_time(2400.0f, 300.0f); // A: 2.4s ±0.3s
+            set_next_hold_time(2150.0f, 100.0f); // A: 2.15s ±0.1s
         }
 
         // A is being held
@@ -446,9 +486,11 @@ void matrix_scan_user(void) {
 /*
 Each macro is toggled by its button. Only one runs at a time.
   OG macro (QK_MACRO_0): UP (0.9s ±0.25s) <-> RCTL (4.5s ±0.7s)
-  Extra macro (QK_MACRO_1): UP (0.7s ±0.2s) <-> A (2.4s ±0.3s)
+  Extra macro (QK_MACRO_1): UP (0.7s ±0.2s) <-> A (2.15s ±0.1s)
 */
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!record->event.pressed) return true; // ✅ release는 무시 (토글 2번 방지)
+
     switch (keycode) {
         case QK_MACRO_0:
             if (record->event.pressed) {
@@ -460,6 +502,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 toggle_macro_extra();
             }
             return false;
+        case OS_TOG: {
+            uint8_t cur = get_highest_layer(default_layer_state);
+            uint8_t next = (cur == 0) ? 1 : 0;
+            set_single_persistent_default_layer(next); // EEPROM에 저장됨
+            return false;
+        }
     }
     return true;
 }
+
+#ifdef RGB_MATRIX_ENABLE
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+    uint8_t dl = get_highest_layer(state); // 0=mac, 1=win
+
+    if (!rgb_matrix_is_enabled()) return state;
+
+    if (dl == 0) {
+        // macOS: 숨쉬기
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_BREATHING);
+        // 숨쉬기 색을 지정하고 싶으면 (예: 화이트)
+        rgb_matrix_sethsv_noeeprom(HSV_WHITE);
+    } else {
+        // Windows: 고정 빨간색
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SPLASH);
+        // rgb_matrix_sethsv_noeeprom(HSV_RED);
+    }
+
+    return state;
+}
+#endif
